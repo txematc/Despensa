@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#286749">
-  <meta name="description" content="Inventario doméstico de productos de limpieza, higiene y alimentación.">
-  <title>Despensa</title>
+  <meta name="description" content="Inventario doméstico compartido de productos de limpieza, higiene y alimentación.">
+  <title>Despensa compartida</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
@@ -13,117 +13,67 @@
 <body>
   <header class="app-header">
     <div class="brand-mark" aria-hidden="true">D</div>
-    <div>
-      <h1>Despensa</h1>
-      <p>Tu inventario doméstico, siempre a mano</p>
-    </div>
+    <div><h1>Despensa</h1><p>Una despensa compartida para los dos</p></div>
   </header>
 
   <main class="container">
-    <section class="panel" aria-labelledby="form-title">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">INVENTARIO</p>
-          <h2 id="form-title">Añadir producto</h2>
-        </div>
-        <span class="heading-icon" aria-hidden="true">＋</span>
+    <section id="setup-panel" class="panel">
+      <div class="section-heading"><div><p class="eyebrow">ACCESO PRIVADO</p><h2>Entrar en Despensa</h2></div><span class="heading-icon" aria-hidden="true">⌂</span></div>
+      <p>Cada persona usa su propia cuenta. Después, una de las dos crea la despensa y la otra se une con el código de invitación.</p>
+      <div class="field"><label for="email">Correo electrónico</label><input id="email" type="email" autocomplete="email" placeholder="tu@correo.com" required></div>
+      <div class="field"><label for="password">Contraseña</label><input id="password" type="password" autocomplete="current-password" minlength="8" placeholder="Mínimo 8 caracteres" required></div>
+      <div class="form-actions"><button id="login-button" class="btn btn-primary" type="button">Iniciar sesión</button><button id="signup-button" class="btn btn-secondary" type="button">Crear cuenta</button></div>
+      <p id="auth-message" class="message" role="status" aria-live="polite"></p>
+      <div id="pantry-choice" class="hidden">
+        <hr>
+        <h3>Configurar tu despensa</h3>
+        <p id="pantry-choice-note">Crea una despensa nueva o introduce el código que te ha dado tu pareja.</p>
+        <div class="field"><label for="pantry-name">Nombre de la despensa (si la creas)</label><input id="pantry-name" type="text" maxlength="60" value="Despensa de casa"></div>
+        <button id="create-pantry-button" class="btn btn-primary" type="button">Crear despensa y generar invitación</button>
+        <div class="field" style="margin-top:1rem"><label for="invite-code">Código de invitación</label><input id="invite-code" type="text" maxlength="20" autocomplete="off" placeholder="Introduce el código"></div>
+        <button id="join-pantry-button" class="btn btn-secondary" type="button">Unirme a una despensa existente</button>
       </div>
-
-      <form id="product-form">
-        <input type="hidden" id="product-id">
-        <div class="field">
-          <label for="category">Categoría <span class="required">*</span></label>
-          <select id="category" required>
-            <option value="Limpieza">Limpieza</option>
-            <option value="Higiene personal">Higiene personal</option>
-            <option value="Alimentación" selected>Alimentación</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="name">Nombre del producto <span class="required">*</span></label>
-          <input id="name" name="name" type="text" placeholder="Ej. Arroz, detergente, champú…" maxlength="100" autocomplete="off" required>
-        </div>
-        <div class="field-row">
-          <div class="field quantity-field">
-            <label for="quantity">Cantidad <span class="required">*</span></label>
-            <input id="quantity" name="quantity" type="number" min="0.001" step="any" inputmode="decimal" placeholder="Ej. 2" required>
-          </div>
-          <div class="field unit-field">
-            <label for="unit">Unidad</label>
-            <select id="unit" name="unit">
-              <option value="ud.">Unidades (ud.)</option>
-              <option value="kg">Kilogramos (kg)</option>
-              <option value="g">Gramos (g)</option>
-              <option value="l">Litros (l)</option>
-              <option value="m">Botesoption>
-              <optionn value="paquete">Paquetes</option>
-              <option value="caja">Cajas</option>
-              <option value="bolsa">Bolsas</option>
-              <option value="latas">Latas</option>  
-            </select>
-          </div>
-        </div>
-        <div class="field">
-          <label for="expiry">Fecha de caducidad <span class="optional">(opcional)</span></label>
-          <input id="expiry" name="expiry" type="date">
-          <small>Déjala vacía si no corresponde.</small>
-        </div>
-        <div class="form-actions">
-          <button class="btn btn-primary" id="save-button" type="submit">Guardar producto</button>
-          <button class="btn btn-secondary hidden" id="cancel-edit" type="button">Cancelar edición</button>
-        </div>
-        <p id="form-message" class="message" role="status" aria-live="polite"></p>
-      </form>
     </section>
 
-    <section class="inventory-section" aria-labelledby="inventory-title">
-      <div class="inventory-heading">
-        <div>
-          <p class="eyebrow">TU CASA</p>
-          <h2 id="inventory-title">Mi despensa <span id="total-count" class="count-badge">0</span></h2>
+    <section id="shared-panel" class="hidden">
+      <div class="panel" style="margin-bottom:1rem">
+        <div class="section-heading"><div><p class="eyebrow">DESPENSA COMPARTIDA</p><h2 id="pantry-title">Mi despensa</h2></div><button id="logout-button" class="btn btn-outline" type="button">Cerrar sesión</button></div>
+        <p>Cuenta: <strong id="current-email"></strong></p>
+        <div id="invite-display" class="invite-box hidden"><p>Comparte este código con tu pareja para que se una a esta misma despensa:</p><strong id="invite-code-display"></strong><button id="copy-code-button" class="btn btn-outline" type="button">Copiar código</button></div>
+        <p id="connection-status" class="message" role="status" aria-live="polite">Conectando con la base de datos…</p>
+      </div>
+
+      <section class="panel" aria-labelledby="form-title">
+        <div class="section-heading"><div><p class="eyebrow">INVENTARIO</p><h2 id="form-title">Añadir producto</h2></div><span class="heading-icon" aria-hidden="true">＋</span></div>
+        <form id="product-form">
+          <input type="hidden" id="product-id">
+          <div class="field"><label for="category">Categoría <span class="required">*</span></label><select id="category" required><option value="Limpieza">Limpieza</option><option value="Higiene personal">Higiene personal</option><option value="Alimentación" selected>Alimentación</option></select></div>
+          <div class="field"><label for="name">Nombre del producto <span class="required">*</span></label><input id="name" name="name" type="text" placeholder="Ej. Arroz, detergente, champú…" maxlength="100" autocomplete="off" required></div>
+          <div class="field-row"><div class="field quantity-field"><label for="quantity">Cantidad <span class="required">*</span></label><input id="quantity" name="quantity" type="number" min="0.001" step="any" inputmode="decimal" placeholder="Ej. 2" required></div><div class="field unit-field"><label for="unit">Unidad</label><select id="unit" name="unit"><option value="ud.">Unidades (ud.)</option><option value="kg">Kilogramos (kg)</option><option value="g">Gramos (g)</option><option value="l">Litros (l)</option><option value="ml">Mililitros (ml)</option></select></div></div>
+          <div class="field"><label for="expiry">Fecha de caducidad <span class="optional">(opcional)</span></label><input id="expiry" name="expiry" type="date"><small>Déjala vacía si no corresponde.</small></div>
+          <div class="form-actions"><button class="btn btn-primary" id="save-button" type="submit">Guardar producto</button><button class="btn btn-secondary hidden" id="cancel-edit" type="button">Cancelar edición</button></div>
+          <p id="form-message" class="message" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="inventory-section" aria-labelledby="inventory-title">
+        <div class="inventory-heading"><div><p class="eyebrow">TU CASA</p><h2 id="inventory-title">Mi despensa <span id="total-count" class="count-badge">0</span></h2></div><button id="export-button" class="btn btn-outline" type="button">Exportar copia</button></div>
+        <div class="filters">
+          <label class="search-box" for="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Buscar producto…" autocomplete="off"></label>
+          <label class="filter-select" for="category-filter"><span class="sr-only">Filtrar por categoría</span><select id="category-filter"><option value="Todas">Todas las categorías</option><option value="Limpieza">Limpieza</option><option value="Higiene personal">Higiene personal</option><option value="Alimentación">Alimentación</option></select></label>
+          <label class="filter-select" for="expiry-filter"><span class="sr-only">Filtrar por caducidad</span><select id="expiry-filter"><option value="Todas">Todas las fechas</option><option value="proximos">Caducan en 30 días</option><option value="caducados">Caducados</option><option value="sin-fecha">Sin fecha</option></select></label>
         </div>
-        <button id="export-button" class="btn btn-outline" type="button">Exportar copia</button>
-      </div>
-
-      <div class="filters">
-        <label class="search-box" for="search">
-          <span aria-hidden="true">⌕</span>
-          <input id="search" type="search" placeholder="Buscar producto…" autocomplete="off">
-        </label>
-        <label class="filter-select" for="category-filter">
-          <span class="sr-only">Filtrar por categoría</span>
-          <select id="category-filter">
-            <option value="Todas">Todas las categorías</option>
-            <option value="Limpieza">Limpieza</option>
-            <option value="Higiene personal">Higiene personal</option>
-            <option value="Alimentación">Alimentación</option>
-          </select>
-        </label>
-        <label class="filter-select" for="expiry-filter">
-          <span class="sr-only">Filtrar por caducidad</span>
-          <select id="expiry-filter">
-            <option value="Todas">Todas las fechas</option>
-            <option value="proximos">Caducan en 30 días</option>
-            <option value="caducados">Caducados</option>
-            <option value="sin-fecha">Sin fecha</option>
-          </select>
-        </label>
-      </div>
-
-      <div id="inventory-list" class="inventory-list"></div>
-      <div id="empty-state" class="empty-state">
-        <div class="empty-illustration" aria-hidden="true">▤</div>
-        <h3>Tu despensa está vacía</h3>
-        <p>Añade tu primer producto usando el formulario.</p>
-      </div>
-      <p id="list-message" class="message" role="status" aria-live="polite"></p>
+        <div id="inventory-list" class="inventory-list"></div>
+        <div id="empty-state" class="empty-state"><div class="empty-illustration" aria-hidden="true">▤</div><h3>Tu despensa está vacía</h3><p>Añade tu primer producto usando el formulario.</p></div>
+        <p id="list-message" class="message" role="status" aria-live="polite"></p>
+        <div class="form-actions"><button id="migrate-local-button" class="btn btn-outline hidden" type="button">Importar productos de esta versión del dispositivo</button><input id="import-file" type="file" accept=".json,application/json" hidden><button id="import-button" class="btn btn-outline" type="button">Importar copia JSON</button></div>
+      </section>
     </section>
-    <footer class="app-footer">
-      <p>Los datos se guardan en este dispositivo. Exporta una copia para tener un respaldo.</p>
-    </footer>
+    <footer class="app-footer"><p>Los datos compartidos se guardan en una base de datos online. Para ver cambios de tu pareja, ambos necesitáis conexión a internet.</p></footer>
   </main>
 
-  <input id="import-file" type="file" accept=".json,application/json" hidden>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
   <script src="app.js" defer></script>
 </body>
 </html>

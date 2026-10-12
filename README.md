@@ -1,49 +1,41 @@
-# Despensa
+# Despensa compartida
 
-Aplicación web progresiva (PWA) para inventario doméstico.
+Versión de la app Despensa que comparte el inventario entre dos personas mediante Supabase. Conserva categorías, cantidades, unidades, caducidades, filtros, edición, eliminación y exportación/importación JSON. Necesita internet para iniciar sesión y sincronizar los datos.
 
-## Archivos
+## Antes de empezar
 
-- `index.html`: estructura de la aplicación.
-- `styles.css`: diseño adaptable a móvil y escritorio.
-- `app.js`: alta, consulta, edición, eliminación, filtros, exportación e importación.
-- `manifest.webmanifest`: nombre, iconos y opciones de instalación.
-- `service-worker.js`: caché para funcionamiento básico sin conexión.
-- `icons/`: icono vectorial y los iconos PNG de la aplicación.
+1. **Guarda una copia de la versión anterior.** Conserva el ZIP anterior y, si la app vieja aún tiene productos en tu navegador, abre esa versión y pulsa «Exportar copia».
+2. Crea una cuenta en [Supabase](https://supabase.com/) y crea un proyecto nuevo. Guarda la contraseña de la base de datos en un lugar seguro.
+3. En el proyecto Supabase, abre **SQL Editor**, crea una consulta nueva, copia todo el contenido de `supabase-schema.sql` y pulsa **Run**.
+4. En Supabase, abre **Project Settings / API** (el nombre de la sección puede variar). Copia la **Project URL** y la clave pública **anon** o **publishable**.
+5. Abre `supabase-config.js` con un editor de texto. Sustituye `PEGA_AQUI_LA_URL_DE_TU_PROYECTO` por la URL y `PEGA_AQUI_TU_CLAVE_PUBLICA_ANON` por la clave pública. Guarda el archivo.
+   - No uses nunca la clave `service_role` ni una clave secreta en archivos que se publican en internet.
+6. En Supabase, revisa **Authentication > URL Configuration** y añade la URL publicada de la app a **Site URL** y a las **Redirect URLs** si el panel te lo solicita. Para GitHub Pages sería algo como `https://TU-USUARIO.github.io/despensa/`.
+7. Publica todos los archivos de esta carpeta en tu repositorio de GitHub Pages, incluida la carpeta `icons`, `supabase-config.js` y `supabase-schema.sql`. No publiques el archivo de configuración hasta que hayas puesto tus claves públicas.
+8. Abre la URL publicada. Crea tu cuenta con correo y contraseña. Si Supabase exige confirmar el correo, abre el mensaje de confirmación y vuelve a iniciar sesión.
+9. Pulsa **Crear despensa y generar invitación**. Se mostrará un código.
+10. Tu pareja abre la misma URL, crea su propia cuenta y escribe el código en **Código de invitación** para unirse a la despensa existente.
 
-## Probar en un ordenador
+## Importar el inventario que ya tenías
 
-La app guarda datos en el `localStorage` del navegador. Para que funcione también el service worker, sirve la carpeta desde `localhost` o desde una web HTTPS.
+La versión antigua guardaba los productos en el navegador; no estaban en un servidor. Por eso la nueva base de datos no puede recuperarlos automáticamente desde otro móvil.
 
-Con Python instalado, abre una terminal dentro de esta carpeta y ejecuta:
+- En el mismo navegador donde usabas la versión antigua, la app nueva detectará los productos locales y mostrará **Importar productos de esta versión del dispositivo**. Púlsalo una sola vez y confirma.
+- Si ya exportaste un JSON, usa **Importar copia JSON**.
+- Antes de importar, comprueba si los productos ya existen en la despensa compartida para evitar duplicados.
 
-```bash
-python -m http.server 8000
-```
+## Seguridad y funcionamiento
 
-Después abre `http://localhost:8000` en el navegador.
+- Cada persona tiene su propia cuenta; el código de invitación permite unirse a la misma despensa.
+- Las políticas de seguridad de la base de datos limitan el acceso a los miembros de esa despensa. Comparte el código solo con tu pareja.
+- La clave pública de Supabase es visible en el navegador por diseño; la seguridad depende de las políticas RLS incluidas en el SQL. Nunca añadas una clave `service_role` a la aplicación.
+- Ambos pueden añadir, editar y eliminar productos. Los cambios se actualizan en tiempo real cuando hay conexión.
+- El modo sin conexión solo puede mostrar la interfaz almacenada en caché; las modificaciones requieren internet.
+- Exporta periódicamente una copia JSON como respaldo.
 
-También puedes utilizar cualquier servidor estático local equivalente. Abrir `index.html` directamente con doble clic permite probar las funciones principales, pero no activa el service worker ni la instalación PWA.
+## Archivos importantes
 
-## Instalar en el móvil
-
-Para instalar la PWA, publica toda esta carpeta en un alojamiento web HTTPS. Puede utilizarse un alojamiento estático gratuito, por ejemplo GitHub Pages, Cloudflare Pages o Netlify.
-
-- **Android (Chrome):** abre la URL HTTPS y usa el menú del navegador, opción «Instalar aplicación» o «Añadir a pantalla de inicio».
-- **iPhone (Safari):** abre la URL HTTPS, pulsa Compartir y elige «Añadir a pantalla de inicio».
-
-La instalación exacta depende del navegador y su versión.
-
-## Datos y copias de seguridad
-
-Los productos se guardan en el almacenamiento local del navegador en ese dispositivo y perfil. No hay cuenta, servidor ni sincronización automática. Borrar los datos del navegador puede borrar el inventario.
-
-Pulsa «Exportar copia» para descargar un archivo JSON. Para restaurarlo, pulsa «Importar copia» y selecciona ese archivo. La importación sustituye el inventario actual, previa confirmación.
-
-## Funcionamiento sin conexión
-
-Después de visitar la app por primera vez desde una URL HTTPS, el service worker guarda los archivos principales para que la interfaz pueda abrirse sin conexión. Los datos se guardan en el almacenamiento local del navegador.
-
-## Iconos PNG
-
-Los iconos `icons/icon-192.png` y `icons/icon-512.png` se incluyen en el paquete. El archivo `icons/icon.svg` es la versión vectorial de referencia.
+- `index.html`, `styles.css`, `app.js`: interfaz y lógica de la aplicación.
+- `supabase-config.js`: URL y clave pública del proyecto (debes configurarlo).
+- `supabase-schema.sql`: tablas, funciones y permisos de la base de datos.
+- `manifest.webmanifest`, `service-worker.js`, `icons/`: instalación como aplicación web progresiva.

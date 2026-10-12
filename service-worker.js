@@ -1,9 +1,10 @@
-const CACHE_NAME = "despensa-static-v1";
+const CACHE_NAME = "despensa-static-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./styles.css",
   "./app.js",
+  "./supabase-config.js",
   "./manifest.webmanifest",
   "./icons/icon.svg"
 ];
